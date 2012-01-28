@@ -141,13 +141,14 @@ class simpleAM_widget extends WP_Widget {
 	function output_blog_authors( $selected_id ) {
 		// Get an array of all the users on the site that aren't subscribers
 		$wp_user_search = new WP_User_Query( array( 'role' => 'administrator' ) );
-		$authors = $wp_user_search->get_results();
+		$admins = $wp_user_search->get_results();
 		$wp_user_search = new WP_User_Query( array( 'role' => 'editor' ) );
-		$authors = array_merge($authors, $wp_user_search->get_results() );
+		$editors $wp_user_search->get_results();
 		$wp_user_search = new WP_User_Query( array( 'role' => 'author' ) );
-		$authors = array_merge($authors,  $wp_user_search->get_results() );
+		$authors = $wp_user_search->get_results();
 		$wp_user_search = new WP_User_Query( array( 'role' => 'contributor' ) );
-		$authors = array_merge($authors,  $wp_user_search->get_results() );
+		$contributors = $wp_user_search->get_results();
+		$authors = arraymerge($admins,$editors,$authors,$contributors);
 		
 		foreach ($authors as $author) {
 			echo '<option value="' . $author->ID . '" ';
