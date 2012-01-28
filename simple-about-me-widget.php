@@ -1,7 +1,7 @@
 <?php 
 /*
 Plugin Name: Simple "About Me" Widget
-Plugin URI: http://brianfactor.wordpress.com/
+Plugin URI: https://github.com/brianfactor/Simple-About-Me-Wordpress-Plugin
 Description: A simple "About Me" widget like the one from Blogger - it outputs a name, mugshot, and a short bio.
 Version: 0.2
 Author: Brian Morgan
@@ -81,7 +81,7 @@ class simpleAM_widget extends WP_Widget {
 			$title = $default_options['title'];
 		}
 		
-		// ** Output input fields - the conataining for has already been created. **
+		// ** Output input fields - the conataining form has already been created. **
 		
 		// Options for which author's bio to output. ?>
 		<p><strong>Select the author this widget is about:</strong><br />
@@ -186,9 +186,9 @@ class simpleAM_widget extends WP_Widget {
 	/* Retrive the mugshot - url to the image */
 	
 	function get_mugshot_url( $author_id ) {
-		// Default Gravatar URL
+		// Default Gravatar image
 		$default_url = 'http://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536';
-		// Get the Gravatar 
+		// Get the mugshot from gravatar
 		$author = get_userdata($author_id);
 		$email = $author->user_email;
 		$hash = md5( strtolower( trim( $email ) ) );
@@ -204,8 +204,5 @@ class simpleAM_widget extends WP_Widget {
 /* Register this widget and it's control options */
 add_action( 'widgets_init', 'simpleAMW_init' );
 function simpleAMW_init() {
-	register_widget("simpleAM_widget");
+	register_widget('simpleAM_widget');
 }
-	/*register_sidebar_widget(array('Simple About Me Widget', 'widgets'), 'simpleAMW_display');
-	register_widget_control(array('Simple About Me Widget', 'widgets'), 'simpleAMW_control', 350, 400);
-	add_action ('widgets_init', 'simpleAMW_init');*/
