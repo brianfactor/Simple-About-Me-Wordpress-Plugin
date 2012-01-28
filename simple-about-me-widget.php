@@ -1,0 +1,210 @@
+<?php 
+/*
+Plugin Name: Simple "About Me" Widget
+Plugin URI: http://brianfactor.wordpress.com/
+Description: A simple "About Me" widget like the one from Blogger - it outputs a name, mugshot, and a short bio.
+Version: 0.2
+Author: Brian Morgan
+Author URI: http://brianfactor.wordpress.com
+License: GPL2
+*/
+
+// (Project S.A.M. - Simple About Me)
+
+// I'm unsure about backward compadibility - it requires at least 2.8 (when the OO widget api was created)
+
+// Support for multiple widgets and authors coming SOON... well, at some point... maybe.
+
+	/* Object variables */
+	
+	$current_plugin_dir = dirname(__FILE__);	// Equal to __DIR__ in PHP 5.3
+	$default_options = array(
+			'author'			=> 0 ,					// Start with no user.
+			'title'				=> ''
+	);
+	
+class simpleAM_widget extends WP_Widget {
+
+	
+	/**
+	 * Core widget functions
+	 */
+	
+	/* Constructor method */
+	
+	function simpleAM_widget() {
+		parent::WP_Widget( /* Base ID */'simpleAMW', /* Name */'Simple_"About_Me"_Widget', array( 'description' => 'A simple "About Me" Widget.' ) );
+	}
+	
+	/* Render this widget in the sidebar */
+	
+	function widget( $args, $instance ) {
+		extract($args); 
+		
+		// Get the user that this about widget is for (get their id)
+		$author_id = $instance['author'];
+		// Get the title
+		$sam_title = $this->get_title($instance['title'], $author_id);
+		
+		$title = apply_filters( 'widget_title', $sam_title );
+		echo $before_widget;
+		if ( !empty( $title ) ) { echo $before_title . $title . $after_title; } ?>
+		
+			<style type="text/css">
+				.about-me-bio .excerpt-thumb { margin: 8px; } 
+				.about-me-bio { position:relative; }
+				.about-me-bio .excerpt-thumb img { margin: 0px; }
+			</style>
+		
+			<div class="about-me-bio">
+					<div class="excerpt-thumb"><img class="wp-post-image" src="<?php echo $this->get_mugshot_url( $author_id ); ?>" /></div>
+					<p class="about-me-text"><?php echo $this->get_about_text( $author_id ); ?></p>
+					<div style="clear:both"></div>
+			</div>
+			
+		<?php echo $after_widget;
+	}
+
+	/* Output user options */
+	
+	function form( $instance ) {
+		
+		// Update the form variables if there are values stored for this instance.
+		if ( $instance ) {
+			// Get the user that this about widget is for (get their id)
+			$author_id = $instance['author'];
+			// Get the title
+			$title = $this->get_title($instance['title'], $author_id);
+		}
+		else {
+			$author_id = $default_options['author'];
+			$title = $default_options['title'];
+		}
+		
+		// ** Output input fields - the conataining for has already been created. **
+		
+		// Options for which author's bio to output. ?>
+		<p><strong>Select the author this widget is about:</strong><br />
+			<select name="<?php echo $this->get_field_name('author'); ?>">
+				<?php $this->output_blog_authors( $author_id ); ?>
+			</select>
+		</p>
+		
+		<?php // Options for the Title ?>
+		<p><strong>Title:</strong><br />
+			<input class="widefat" type="text" 
+				id="<?php echo $this->get_field_id('title'); ?>" 
+				name="<?php echo $this->get_field_name('title'); ?>" 
+				value="<?php echo $title; ?>"/><br/>
+			Or leave blank to use the default - "About Your Name"
+		</p>
+		
+		<p><strong>Mugshot:</strong><br />
+			To get your profile picture to show up automatically, <a href="http://www.authormedia.com/2009/04/27/how-to-get-your-avatar-to-show-up-everywhere/">get a Gravatar</a>.<br />
+		</p>
+
+		<p><strong>Bio:</strong><br />
+			Go edit <a href="<?php echo admin_url('profile.php'); ?>">your Profile</a> "Biogaphical Info" to change the text of this bio.
+		</p>
+		
+		<p><strong>Rough Preview:</strong></p>
+			<div style="border:1px solid grey; padding: 5px; margin: 5px;">
+				<h3><?php echo $title; ?></h3>
+				<div style="position:relative;">
+					<div class="excerpt-thumb"><img class="wp-post-image" style="float: left;" src="<?php echo $this->get_mugshot_url( $author_id ); ?>" /></div>
+					<p class="about-me-text"><?php echo $this->get_about_text( $author_id ); ?></p>
+					<div style="clear:both"></div>
+				</div>
+			</div>
+	<?php }
+	
+	/* Sanitize and store form input */
+	
+	function update ( $new_instance, $old_instance ) {
+		$instance = $old_instance; // Start with all the variable so we don't loose the ones the user didn't change.
+		$instance['author'] = $new_instance['author'];
+		if ( $new_instance['author'] != $old_instance['author'] ) { // If the form changed authors, reset the title
+			$instance['title'] = $default_options['title'];
+		}
+		else {
+			$instance['title'] = $new_instance['title'];
+		}
+		return $instance;
+	}
+	
+	/**
+	 * Other useful functions for this widget
+	 */
+	 
+	/* Ouput all authors and their ids in option tags */
+	
+	function output_blog_authors( $selected_id ) {
+		// Get an array of all the users on the site that aren't subscribers
+		$wp_user_search = new WP_User_Query( array( 'role' => 'administrator' ) );
+		$authors = $wp_user_search->get_results();
+		$wp_user_search = new WP_User_Query( array( 'role' => 'editor' ) );
+		$authors = array_merge($authors, $wp_user_search->get_results() );
+		$wp_user_search = new WP_User_Query( array( 'role' => 'author' ) );
+		$authors = array_merge($authors,  $wp_user_search->get_results() );
+		$wp_user_search = new WP_User_Query( array( 'role' => 'contributor' ) );
+		$authors = array_merge($authors,  $wp_user_search->get_results() );
+		
+		foreach ($authors as $author) {
+			echo '<option value="' . $author->ID . '" ';
+			if ( $selected_id == $author->ID ) { echo 'selected '; }
+			echo '>';
+			echo $author->display_name;
+			echo '</option>';
+		}
+		
+	}
+	
+	/* Retrive title/name */
+	
+	function get_title( $optional_text, $author_id ) {
+		
+		if ( !empty($optional_text) ) {
+			return esc_html($optional_text);
+		}
+		else {		// If the user leaves the title blank, return "About Display Name"
+			$author = get_userdata($author_id);
+			$name = $author->display_name;
+			return esc_html('About ' . $name);
+		}
+		
+	}
+	
+	/* Retrive the "about me" text */
+	
+	function get_about_text ($author_id) {
+		$author = get_userdata($author_id);
+		$bio = $author->user_description;
+		return $bio;
+	}
+	
+	/* Retrive the mugshot - url to the image */
+	
+	function get_mugshot_url( $author_id ) {
+		// Default Gravatar URL
+		$default_url = 'http://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536';
+		// Get the Gravatar 
+		$author = get_userdata($author_id);
+		$email = $author->user_email;
+		$hash = md5( strtolower( trim( $email ) ) );
+		$gravatar_url = 'http://www.gravatar.com/avatar/' . $hash;	// Default size: 80x80
+		if ( !empty($gravatar_url) ) {
+			 return $gravatar_url;
+		}
+		else return $default_url;
+	}
+	
+}
+
+/* Register this widget and it's control options */
+add_action( 'widgets_init', 'simpleAMW_init' );
+function simpleAMW_init() {
+	register_widget("simpleAM_widget");
+}
+	/*register_sidebar_widget(array('Simple About Me Widget', 'widgets'), 'simpleAMW_display');
+	register_widget_control(array('Simple About Me Widget', 'widgets'), 'simpleAMW_control', 350, 400);
+	add_action ('widgets_init', 'simpleAMW_init');*/
