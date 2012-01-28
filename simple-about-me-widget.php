@@ -86,7 +86,7 @@ class simpleAM_widget extends WP_Widget {
 		// Options for which author's bio to output. ?>
 		<p><strong>Select the author this widget is about:</strong><br />
 			<select name="<?php echo $this->get_field_name('author'); ?>">
-				<?php $this->output_blog_authors( $author_id ); ?>
+				<?php $this->blog_author_options( $author_id ); ?>
 			</select>
 		</p>
 		
@@ -138,7 +138,7 @@ class simpleAM_widget extends WP_Widget {
 	 
 	/* Ouput all authors and their ids in option tags */
 	
-	function output_blog_authors( $selected_id ) {
+	function blog_author_options( $selected_id ) {
 		// Get an array of all the users on the site that aren't subscribers
 		$wp_user_search = new WP_User_Query( array( 'role' => 'administrator' ) );
 		$admins = $wp_user_search->get_results();
