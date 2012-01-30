@@ -143,7 +143,7 @@ class simpleAM_widget extends WP_Widget {
 		$wp_user_search = new WP_User_Query( array( 'role' => 'administrator' ) );
 		$admins = $wp_user_search->get_results();
 		$wp_user_search = new WP_User_Query( array( 'role' => 'editor' ) );
-		$editors $wp_user_search->get_results();
+		$editors = $wp_user_search->get_results();
 		$wp_user_search = new WP_User_Query( array( 'role' => 'author' ) );
 		$authors = $wp_user_search->get_results();
 		$wp_user_search = new WP_User_Query( array( 'role' => 'contributor' ) );
