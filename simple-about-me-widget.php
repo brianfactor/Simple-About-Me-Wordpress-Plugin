@@ -22,8 +22,8 @@ class simpleAM_widget extends WP_Widget {
 	
 	//public $current_plugin_dir = dirname(__FILE__);	// Equal to __DIR__ in PHP 5.3
 	public $default_options = array(
-			'author'			=> 0,					// Start with no user.
-			'title'				=> ''
+			'author'	=> 0,	// Start with no user.
+			'title'		=> ''
 	);
 	
 	/**
@@ -33,7 +33,11 @@ class simpleAM_widget extends WP_Widget {
 	/* Constructor method */
 	
 	function simpleAM_widget() {
-		parent::WP_Widget( /* Base ID */'simpleAMW', /* Name */'Simple "About Me" Widget', array( 'description' => 'A simple "About Me" Widget.' ) );
+		parent::WP_Widget(
+		/* Base ID */	'simpleAMW',
+		/* Name */	'Simple "About Me" Widget',
+				array( 'description' => 'Displays the basic information from your profile.' )
+		);
 	}
 	
 	/* Render this widget in the sidebar */
