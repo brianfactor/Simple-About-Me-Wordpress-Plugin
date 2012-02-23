@@ -11,7 +11,7 @@ License: GPL2
 
 // (Project S.A.M. - Simple About Me)
 
-// I'm unsure about backward compadibility - it requires at least 2.8 (when the OO widget api was created)
+// I'm unsure about backward compatibility - it requires at least 2.8 (when the OO widget api was created)
 
 // Support for multiple widgets and authors coming SOON... well, at some point... maybe.
 
@@ -85,7 +85,7 @@ class simpleAM_widget extends WP_Widget {
 			$title = $this->default_options['title'];
 		}
 		
-		// ** Output input fields - the conataining form has already been created. **
+		// ** Output input fields - the containing form has already been created. **
 		
 		// Options for which author's bio to output. ?>
 		<p><strong>Select the author this widget is about:</strong><br />
@@ -197,7 +197,7 @@ class simpleAM_widget extends WP_Widget {
 		return $bio;
 	}
 	
-	/* Retrive the mugshot - url to the image */
+	/* Retrieve the mugshot - url to the image */
 	
 	function get_mugshot_url( $author_id ) {
 		// Default Gravatar image (not really necessary)
